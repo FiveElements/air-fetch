@@ -1,0 +1,62 @@
+<link rel="import" href="../polymer/polymer.html">
+
+<!--
+`air-fetch`
+Polymer 2 Element for Wrap Fetch API
+
+@demo demo/index.html
+-->
+
+<dom-module id="air-fetch">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <h2>Hello [[url]]</h2>
+    </template>
+
+    <script>
+        customElements.define('air-fetch', class extends Polymer.Element {
+            static get is() {
+                return 'air-fetch';
+            }
+
+            static get config() {
+                return {
+                    properties: {
+                        url: {
+                            type: String,
+                            value: 'air-fetch'
+                        },
+                        method: {
+                            type: String,
+                            value: 'GET'
+                        },
+                        headers: {
+                            type: Object
+                        },
+                        init: {
+                            type: Object
+                            value: function () {
+                                return {
+                                    method: 'GET',
+                                    headers: myHeaders,
+                                    mode: 'cors',
+                                    cache: 'default'
+                                };
+                            }
+                        }
+                    }
+                };
+            };
+
+
+            _fetchPromise() {
+
+            }
+
+        });
+    </script>
+</dom-module>
