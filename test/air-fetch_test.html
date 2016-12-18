@@ -14,7 +14,7 @@
 <body>
 <test-fixture id="basic">
     <template>
-        <air-fetch></air-fetch>
+        <air-fetch not-auto></air-fetch>
     </template>
 </test-fixture>
 
@@ -30,30 +30,30 @@
     });
 
     suite('url management', function () {
-        test('_parseParams', function () {
+        test('_queryString', function () {
             var element = fixture('basic');
             var params = {
                 parameter1: 'value_1',
                 parameter2: 'value 2',
                 parameter3: 'value&3'
             };
-            var qs = element._parseParams(params);
+            var qs = element._queryString(params);
             assert.equal(qs, 'parameter1=value_1&parameter2=value%202&parameter3=value%263');
         });
-        test('_parseParams nothing', function () {
+        test('_queryString nothing', function () {
             var element = fixture('basic');
             var params = {};
-            var qs = element._parseParams(params);
+            var qs = element._queryString(params);
             assert.equal(qs, '');
         });
-        test('_parseParams undefined', function () {
+        test('_queryString undefined', function () {
             var element = fixture('basic');
             var params = undefined;
-            var qs = element._parseParams(params);
+            var qs = element._queryString(params);
             assert.equal(qs, '');
         });
 
-        test('_parsedUrl', function () {
+        test('_requestUrl', function () {
             var element = fixture('basic');
             var params = {
                 parameter1: 'value_1',
@@ -61,24 +61,24 @@
                 parameter3: 'value&3'
             };
             var baseUrl = 'http://www.google.fr';
-            var url = element._parsedUrl(baseUrl, params);
+            var url = element._requestUrl(baseUrl, params);
             assert.equal(url, 'http://www.google.fr?parameter1=value_1&parameter2=value%202&parameter3=value%263');
         });
-        test('_parsedUrl with params', function () {
+        test('_requestUrl with params', function () {
             var element = fixture('basic');
             var params = {
                 parameter2: 'value 2',
                 parameter3: 'value&3'
             };
             var baseUrl = 'http://www.google.fr?parameter1=value_1';
-            var url = element._parsedUrl(baseUrl, params);
+            var url = element._requestUrl(baseUrl, params);
             assert.equal(url, 'http://www.google.fr?parameter1=value_1&parameter2=value%202&parameter3=value%263');
         });
-        test('_parsedUrl without params', function () {
+        test('_requestUrl without params', function () {
             var element = fixture('basic');
             var params = undefined;
             var baseUrl = 'http://www.google.fr';
-            var url = element._parsedUrl(baseUrl, params);
+            var url = element._requestUrl(baseUrl, params);
             assert.equal(url, 'http://www.google.fr');
         });
     });

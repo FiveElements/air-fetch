@@ -113,6 +113,48 @@ Polymer 2 Element for Wrap Fetch API
 
             // --- Url logic
             // --- ---------------------------
+            /**
+             * The query string that should be appended to the `url`, serialized from
+             * the current value of `params`.
+             *
+             * @return {string}
+             */
+            _queryString (params) {
+                var queryParts = [];
+                var param;
+                var value;
+                var esc = window.encodeURIComponent;
+                for (param in params) {
+                    value = params[param];
+                    param = esc(param);
+                    if (Array.isArray(value)) {
+                        for (var i = 0; i < value.length; i++) {
+                            queryParts.push(param + '=' + esc(value[i]));
+                        }
+                    } else if (value !== null) {
+                        queryParts.push(param + '=' + esc(value));
+                    } else {
+                        queryParts.push(param);
+                    }
+                }
+                return queryParts.join('&');
+            };
+
+            /**
+             * The `url` with query string (if `params` are specified).
+             *
+             * @return {string}
+             */
+            _requestUrl(urlBase, params) {
+                var queryString = this._queryString(params);
+                var url = urlBase || '';
+                if (queryString) {
+                    var bindingChar = url.indexOf('?') >= 0 ? '&' : '?';
+                    return url + bindingChar + queryString;
+                }
+                return url;
+            };
+
             _parseParams(params) {
                 if (!params) {
                     return '';
@@ -126,7 +168,7 @@ Polymer 2 Element for Wrap Fetch API
 
             _parsedUrl(baseUrl, params) {
                 var url = baseUrl;
-                var qs = this._parsedUrl(params);
+                var qs = this._parseParams(params);
                 var index = baseUrl.indexOf('?');
                 if (index === -1) {
                     url += '?' + qs;
@@ -149,7 +191,7 @@ Polymer 2 Element for Wrap Fetch API
             // --- ---------------------------
 
             _fetchPromise(url, init) {
-                return fetch(url, params).then(response => {
+                return fetch(url, init).then(response => {
                     return response;
                 });
             };
@@ -164,7 +206,7 @@ Polymer 2 Element for Wrap Fetch API
                     self.response = undefined;
                     self._fireFetchError(err);
                 });
-            },
+            };
 
             // --- Event fetch
             // --- ---------------------------
