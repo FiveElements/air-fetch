@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
@@ -10,74 +10,80 @@
     <script src="../../web-component-tester/browser.js"></script>
 
     <link rel="import" href="../air-fetch.html">
-  </head>
-  <body>
-    <test-fixture id="basic">
-      <template>
+</head>
+<body>
+<test-fixture id="basic">
+    <template>
         <air-fetch></air-fetch>
-      </template>
-    </test-fixture>
+    </template>
+</test-fixture>
 
-    <script>
-      suite('air-fetch', function() {
-        test('instantiating the element works', function() {
-          var element = fixture('basic');
-          // FIXME: This fails for some reason unless it's run async
-          setTimeout(function() {
-            assert.equal(element.is, 'air-fetch');
-          });
+<script>
+    suite('air-fetch', function () {
+        test('instantiating the element works', function () {
+            var element = fixture('basic');
+            // FIXME: This fails for some reason unless it's run async
+            setTimeout(function () {
+                assert.equal(element.is, 'air-fetch');
+            });
         });
-      });
+    });
 
-      suite('url management', function() {
-        test('_parseParams', function() {
-          var element = fixture('basic');
-          var params = {
-            parameter1: 'value_1',
-            parameter2: 'value 2',
-            parameter3: 'value&3'
-          };
-          var qs = element._parseParams(params);
-          assert.equal(qs, 'parameter1=value_1&parameter2=value%202&parameter3=value%263');
+    suite('url management', function () {
+        test('_parseParams', function () {
+            var element = fixture('basic');
+            var params = {
+                parameter1: 'value_1',
+                parameter2: 'value 2',
+                parameter3: 'value&3'
+            };
+            var qs = element._parseParams(params);
+            assert.equal(qs, 'parameter1=value_1&parameter2=value%202&parameter3=value%263');
         });
-        test('_parseParams nothing', function() {
-          var element = fixture('basic');
-          var params = {  };
-          var qs = element._parseParams(params);
-          assert.equal(qs, '');
+        test('_parseParams nothing', function () {
+            var element = fixture('basic');
+            var params = {};
+            var qs = element._parseParams(params);
+            assert.equal(qs, '');
         });
-        test('_parseParams undefined', function() {
-          var element = fixture('basic');
-          var params = undefined;
-          var qs = element._parseParams(params);
-          assert.equal(qs, '');
-        });
-
-        test('_parsedUrl', function() {
-          var element = fixture('basic');
-          var params = {
-            parameter1: 'value_1',
-            parameter2: 'value 2',
-            parameter3: 'value&3'
-          };
-          var baseUrl  = 'http://www.google.fr';
-          var url = element._parsedUrl(baseUrl, params);
-          assert.equal(url, 'http://www.google.fr?parameter1=value_1&parameter2=value%202&parameter3=value%263');
-        });
-        test('_parsedUrl with params', function() {
-          var element = fixture('basic');
-          var params = {
-            parameter2: 'value 2',
-            parameter3: 'value&3'
-          };
-          var baseUrl  = 'http://www.google.fr?parameter1=value_1';
-          var url = element._parsedUrl(baseUrl, params);
-          assert.equal(url, 'http://www.google.fr?parameter1=value_1&parameter2=value%202&parameter3=value%263');
+        test('_parseParams undefined', function () {
+            var element = fixture('basic');
+            var params = undefined;
+            var qs = element._parseParams(params);
+            assert.equal(qs, '');
         });
 
-      });
+        test('_parsedUrl', function () {
+            var element = fixture('basic');
+            var params = {
+                parameter1: 'value_1',
+                parameter2: 'value 2',
+                parameter3: 'value&3'
+            };
+            var baseUrl = 'http://www.google.fr';
+            var url = element._parsedUrl(baseUrl, params);
+            assert.equal(url, 'http://www.google.fr?parameter1=value_1&parameter2=value%202&parameter3=value%263');
+        });
+        test('_parsedUrl with params', function () {
+            var element = fixture('basic');
+            var params = {
+                parameter2: 'value 2',
+                parameter3: 'value&3'
+            };
+            var baseUrl = 'http://www.google.fr?parameter1=value_1';
+            var url = element._parsedUrl(baseUrl, params);
+            assert.equal(url, 'http://www.google.fr?parameter1=value_1&parameter2=value%202&parameter3=value%263');
+        });
+        test('_parsedUrl without params', function () {
+            var element = fixture('basic');
+            var params = undefined;
+            var baseUrl = 'http://www.google.fr';
+            var url = element._parsedUrl(baseUrl, params);
+            assert.equal(url, 'http://www.google.fr');
+        });
+    });
 
 
-    </script>
-  </body>
+</script>
+</body>
 </html>

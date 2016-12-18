@@ -110,6 +110,7 @@ Polymer 2 Element for Wrap Fetch API
                 this.init.cache = newValue;
                 this.init = this.init;
             };
+
             // --- Url logic
             // --- ---------------------------
             _parseParams(params) {
@@ -124,15 +125,15 @@ Polymer 2 Element for Wrap Fetch API
             };
 
             _parsedUrl(baseUrl, params) {
-              var index = baseUrl.indexOf('?');
                 var url = baseUrl;
                 var qs = this._parsedUrl(params);
+                var index = baseUrl.indexOf('?');
                 if (index === -1) {
                     url += '?' + qs;
                 } else {
                     url += '&' + qs;
                 }
-                return  url;
+                return url;
             };
 
             // --- Complex Observer
@@ -160,7 +161,7 @@ Polymer 2 Element for Wrap Fetch API
              *
              * @event air-fetch-response
              */
-            _fireFetchResponse  (response) {
+            _fireFetchResponse(response) {
                 console.log('air-fetch-response', response);
                 this.fire('air-fetch-response', response);
             };
@@ -170,7 +171,7 @@ Polymer 2 Element for Wrap Fetch API
              *
              * @event air-fetch-error
              */
-            _fireFetchError   (error) {
+            _fireFetchError(error) {
                 console.error('air-fetch-error', error);
                 this.fire('air-fetch-error', {error: error});
             };
