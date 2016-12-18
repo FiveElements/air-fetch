@@ -156,7 +156,7 @@ Polymer 2 Element for Wrap Fetch API
 
             _fetch (jwk, data) {
                 var self = this;
-                return this._encryptPromise(jwk, data).then(function (response) {
+                return this._fetchPromise(jwk, data).then(function (response) {
                     self.response = response;
                     self._fireFetchResponse(response);
                     return response;
