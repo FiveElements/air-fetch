@@ -154,6 +154,18 @@ Polymer 2 Element for Wrap Fetch API
                 });
             };
 
+            _fetch (jwk, data) {
+                var self = this;
+                return this._encryptPromise(jwk, data).then(function (response) {
+                    self.response = response;
+                    self._fireFetchResponse(response);
+                    return response;
+                }).catch(function (err) {
+                    self.response = undefined;
+                    self._fireFetchError(err);
+                });
+            },
+
             // --- Event fetch
             // --- ---------------------------
             /**
