@@ -22,7 +22,19 @@
       <h3>Basic air-fetch demo</h3>
       <demo-snippet>
         <template>
-          <air-fetch></air-fetch>
+          <air-fetch url="https://www.googleapis.com/youtube/v3/search"
+                     params='{"part":"snippet", "q":"polymer", "key": "AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI", "type": "video"}'
+                     response="{{ajaxResponse}}">
+
+          </air-fetch>
+          <template is="dom-repeat" items="[[ajaxResponse.items]]">
+            <div class="horizontal-section">
+              <h2><a href="[[url(item.id.videoId)]]" target="_blank">[[item.snippet.title]]</a></h2>
+              <iron-image src="[[item.snippet.thumbnails.high.url]]" width="256" height="256" sizing="cover" preload fade></iron-image>
+              <p>[[item.snippet.description]]</p>
+            </div>
+          </template>
+
         </template>
       </demo-snippet>
     </div>
