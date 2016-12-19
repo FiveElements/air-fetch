@@ -21,8 +21,14 @@
     <div class="vertical-section-container centered">
       <h3>Basic air-fetch demo</h3>
       <demo-snippet>
-        <template>
-          <air-fetch url="https://www.googleapis.com/youtube/v3/search"
+        <template is="dom-bind" id="demo">
+          <!--<air-fetch url="https://www.googleapis.com/youtube/v3/search"-->
+                     <!--params='{"part":"snippet", "q":"polymer", "key": "AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI", "type": "video"}'-->
+                     <!--response="{{ajaxResponse}}">-->
+
+          <!--</air-fetch>   -->
+            <div>ajaxResponse: <p>[[ajaxResponse]]</p></div>
+          <air-fetch url="https://www.googleapis.com/youtube/v3/search?type=video&part=snippet&q=polymer&key=AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI"
                      params='{"part":"snippet", "q":"polymer", "key": "AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI", "type": "video"}'
                      response="{{ajaxResponse}}">
 
@@ -36,6 +42,12 @@
           </template>
 
         </template>
+          <script>
+              var app = document.querySelector('#demo');
+              app.url = function (videoId) {
+                  return 'https://www.youtube.com/watch?v=' + videoId;
+              };
+          </script>
       </demo-snippet>
     </div>
   </body>

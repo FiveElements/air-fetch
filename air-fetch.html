@@ -14,7 +14,7 @@ Polymer 2 Element for Wrap Fetch API
                 display: block;
             }
         </style>
-        <h2>Hello [[url]]</h2>
+        <h2>Hello [[response]]</h2>
     </template>
 
     <script>
@@ -85,6 +85,10 @@ Polymer 2 Element for Wrap Fetch API
                         headers: {
                             type: Array
                         },
+                        response: {
+                            type: Object,
+                            notify: true
+                        }
                     },
 
                     observers: [
@@ -97,18 +101,73 @@ Polymer 2 Element for Wrap Fetch API
             // --- Changed Observer
             // --- ---------------------------
             _methodChanged(newValue, oldValue) {
+                console.log('_methodChanged', newValue);
                 this.init.method = newValue;
                 this.init = this.init;
             };
 
             _modeChanged(newValue, oldValue) {
+                console.log('_modeChanged', newValue);
                 this.init.mode = newValue;
                 this.init = this.init;
             };
 
             _cacheChanged(newValue, oldValue) {
+                console.log('_cacheChanged', newValue);
                 this.init.cache = newValue;
                 this.init = this.init;
+            };
+
+            // --- Complex Observer
+            // --- ---------------------------
+
+            _fetchObserver(url, init, notAuto) {
+                if (!notAuto) {
+                    this._fetch(url, init);
+                }
+            };
+
+            // --- API
+            // --- ---------------------------
+
+            _fetchPromise(url, init) {
+                return fetch(url, init).then(response => {
+                    return response.json();
+                });
+            };
+
+            _fetch (jwk, data) {
+                var self = this;
+                return this._fetchPromise(jwk, data).then(function (response) {
+                    self.response = response;
+                    self._fireFetchResponse(response);
+                    return response;
+                }).catch(function (err) {
+                    self.response = undefined;
+                    self._fireFetchError(err);
+                });
+            };
+
+            // --- Event fetch
+            // --- ---------------------------
+            /**
+             * Fired when a Fetch response is raised.
+             *
+             * @event air-fetch-response
+             */
+            _fireFetchResponse(response) {
+                console.log('air-fetch-response', response);
+//                this.fire('air-fetch-response', response);
+            };
+
+            /**
+             * Fired when a fetch Error in raised.
+             *
+             * @event air-fetch-error
+             */
+            _fireFetchError(error) {
+                console.error('air-fetch-error', error);
+                this.fire('air-fetch-error', {error: error});
             };
 
             // --- Url logic
@@ -155,80 +214,7 @@ Polymer 2 Element for Wrap Fetch API
                 return url;
             };
 
-            _parseParams(params) {
-                if (!params) {
-                    return '';
-                }
-                var esc = encodeURIComponent;
-                var query = Object.keys(params)
-                        .map(k => esc(k) + '=' + esc(params[k]))
-                        .join('&');
-                return query;
-            };
 
-            _parsedUrl(baseUrl, params) {
-                var url = baseUrl;
-                var qs = this._parseParams(params);
-                var index = baseUrl.indexOf('?');
-                if (index === -1) {
-                    url += '?' + qs;
-                } else {
-                    url += '&' + qs;
-                }
-                return url;
-            };
-
-            // --- Complex Observer
-            // --- ---------------------------
-
-            _fetchObserver(url, init, notAuto) {
-                if (!notAuto) {
-                    this._fetch(url, init);
-                }
-            };
-
-            // --- API
-            // --- ---------------------------
-
-            _fetchPromise(url, init) {
-                return fetch(url, init).then(response => {
-                    return response;
-                });
-            };
-
-            _fetch (jwk, data) {
-                var self = this;
-                return this._fetchPromise(jwk, data).then(function (response) {
-                    self.response = response;
-                    self._fireFetchResponse(response);
-                    return response;
-                }).catch(function (err) {
-                    self.response = undefined;
-                    self._fireFetchError(err);
-                });
-            };
-
-            // --- Event fetch
-            // --- ---------------------------
-            /**
-             * Fired when a Fetch response is raised.
-             *
-             * @event air-fetch-response
-             */
-            _fireFetchResponse(response) {
-                console.log('air-fetch-response', response);
-                this.fire('air-fetch-response', response);
-            };
-
-            /**
-             * Fired when a fetch Error in raised.
-             *
-             * @event air-fetch-error
-             */
-            _fireFetchError(error) {
-                console.error('air-fetch-error', error);
-                this.fire('air-fetch-error', {error: error});
-            };
 
         });
     </script>
