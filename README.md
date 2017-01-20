@@ -1,6 +1,6 @@
-# \<air-fetch\>
+# \<air-fetch\> [![Build Status](https://travis-ci.org/FiveElements/air-fetch.svg?branch=master)](https://travis-ci.org/FiveElements/air-fetch)
 
-Polymer 2 Element for Wrap Fetch API
+Polymer 1 Element for Wrap Fetch API
 
 This custom element depends on [Polymer 2.0-preview](https://github.com/polymer/polymer/tree/2.0-preview).
  
