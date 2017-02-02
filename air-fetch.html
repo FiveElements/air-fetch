@@ -16,6 +16,10 @@ Polymer 2 Element for Wrap Fetch API
 
 
             properties: {
+                debug: {
+                    type: Boolean,
+                    value: true
+                },
                 url: {
                     type: String,
                     value: 'air-fetch'
@@ -30,21 +34,9 @@ Polymer 2 Element for Wrap Fetch API
                     type: Boolean,
                     value: false
                 },
-                init: {
-                    type: Object,
-                    value: function () {
-                        return {
-                            method: 'GET',
-                            headers: 'myHeaders',
-                            mode: 'cors',
-                            cache: 'default'
-                        };
-                    }
-                },
                 method: {
                     type: String,
-                    value: 'GET',
-                    observer: '_methodChanged'
+                    value: 'GET'
                 },
                 /**
                  * A request has an associated mode, which is "same-origin", "cors", "no-cors", "navigate", or "websocket".
@@ -52,8 +44,7 @@ Polymer 2 Element for Wrap Fetch API
                  */
                 mode: {
                     type: String,
-                    value: 'cors',
-                    observer: '_modeChanged'
+                    value: 'cors'
                 },
                 /**
                  * A request has an associated cache mode, which is "default", "no-store", "reload", "no-cache", "force-cache", or "only-if-cached".
@@ -69,8 +60,45 @@ Polymer 2 Element for Wrap Fetch API
                  */
                 cache: {
                     type: String,
-                    value: 'default',
-                    observer: '_cacheChanged'
+                    value: 'default'
+                },
+
+                /**
+                 * Fetch Configuration :
+                 *
+                 * The redirect mode to use: follow, error, or manual. In Chrome the default is follow
+                 */
+                redirect: {
+                    type: String,
+                    value: 'follow'
+                },
+                /**
+                 * Fetch Configuration :
+                 *
+                 * A USVString specifying no-referrer, client, or a URL. The default is client.
+                 */
+                referrer: {
+                    type: String,
+                    value: 'client'
+                },
+                /**
+                 *  Fetch Configuration :
+                 *
+                 *  integrity: Contains the subresource integrity value of the request (e.g., sha256-BpfBw7ivV8q2jLiT13fxDYAe2tJllusRSZ273h2nFSE=). (https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
+                 */
+                integrity: {
+                    type: String
+                },
+                /**
+                 *  Fetch Configuration :
+                 *
+                 * credentials: The request credentials you want to use for the request: omit, same-origin, or include. The default is omit.
+                 * In Chrome the default is same-origin before Chrome 47
+                 * and include starting with Chrome 47.
+                 */
+                credentials: {
+                    type: String,
+                    value: 'omit'
                 },
                 headers: {
                     type: Array
@@ -78,62 +106,189 @@ Polymer 2 Element for Wrap Fetch API
                 response: {
                     type: Object,
                     notify: true
+                },
+                responseHeaders: {
+                    type: Object,
+                    notify: true
                 }
             },
 
+            // TODO , integrity
             observers: [
-                '_fetchObserver(url, init, notAuto)'
+                '_fetchObserver(url, params.*, notAuto, method, mode, cache, cache, redirect, referrer, credentials)'
             ],
 
 
-            // --- Changed Observer
-            // --- ---------------------------
-            _methodChanged: function (newValue, oldValue) {
-                console.log('_methodChanged', newValue);
-                this.init.method = newValue;
-                this.init = this.init;
-            },
-
-            _modeChanged: function (newValue, oldValue) {
-                console.log('_modeChanged', newValue);
-                this.init.mode = newValue;
-                this.init = this.init;
-            },
-
-            _cacheChanged: function (newValue, oldValue) {
-                console.log('_cacheChanged', newValue);
-                this.init.cache = newValue;
-                this.init = this.init;
-            },
 
             // --- Complex Observer
             // --- ---------------------------
 
-            _fetchObserver: function (url, init, notAuto) {
+            _fetchObserver: function (url, paramChanged, notAuto, method) {
                 if (!notAuto) {
-                    this._fetch(url, init);
+                    this._fetch();
                 }
             },
 
             // --- API
             // --- ---------------------------
 
-            _fetchPromise: function (url, init) {
-                return fetch(url, init).then(function (response) {
-                    return response.json();
+
+            // --- Fetch Configuration
+            // --- ---------------------------
+
+            _defaultHearders: function () {
+                var myHeaders = new Headers({
+                    'Content-Type': 'application/json' // "text/plain"
+                });
+                return myHeaders;
+            },
+
+            /**
+             * Compute default Fetch option
+             * @returns {{method: *, mode: *, headers: *}}
+             * @private
+             */
+            _defaultOptions: function () {
+                var myHeaders = this._defaultHearders();
+                // https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
+                // method: The request method, e.g., GET, POST.
+                // credentials: The request credentials you want to use for the request: omit, same-origin, or include. The default is omit.
+
+                var init = {
+                    method: this.method,
+                    mode: this.mode,
+                    cache: this.cache,
+                    redirect: this.redirect,
+                    referrer: this.referrer,
+                    credentials: this.credentials,
+                    headers: myHeaders
+                };
+                if (this.integrity) {
+                    init.integrity = this.integrity;
+                }
+                if (this.debug) console.log('fetch init this.method: ', this.method);
+                if (this.debug) console.log('fetch init : ', init);
+                return init;
+            },
+
+            _fetchIniRequestUrl: function (url, params) {
+                if (this.debug) console.log('Construct url :', url, ' --- params :', params);
+                return this._requestUrl(url, params);
+            },
+
+
+            // --- Fetch Helper
+            // --- ---------------------------
+            _fetchRequest: function (opt) {
+                if (this.debug) console.log('____________ Fetch opt', opt.init.method, opt.url, ' ____________');
+                return window.fetch(opt.url, opt.init);
+            },
+
+            _checkResponseStatus: function (response) {
+                if (!response.ok) {
+                    return response.text().then(function (text) {
+                        var error = new Error(response.status + ' (' + response.statusText + ')');
+                        error.status = response.status;
+                        error.statusText = response.statusText;
+                        error.bodyText = text;
+                        return Promise.reject(error);
+                    });
+                }
+                return response;
+            },
+
+
+            // --- Fetch Request
+            // --- -------------------------------
+
+            /**
+             * Fetch configuration for Retrieve request in format
+             * ```js
+             * {
+             *   url: 'String',
+             *   init: {},
+             *   data: {}
+             * }
+             * ```
+             */
+            _fetchInitRequest: function (url, params, data) {
+                var self = this;
+                var opt = this._defaultOptions(data);
+                return new Promise(function (resolve, reject) {
+                    var urlGet = self._fetchIniRequestUrl(url, params);
+                    resolve({init: opt, url: urlGet});
+                }.bind(this));
+            },
+
+            // --- Fetch Promise Logic
+            // --- ---------------------------
+            _fetchPromiseRequest: function (url, params, data) {
+
+                return this._fetchInitRequest(url, params, data)
+                        .then(this._fetchRequest.bind(this)) // Do Request
+                        .then(this._checkResponseStatus.bind(this))
+                        .then(this._transformResponseContentType.bind(this))
+                        .then(this._adapterResponseRetrieve.bind(this))
+            },
+
+            _fetchPromise: function (url, params, data) {
+                return this._fetchPromiseRequest(url, params, data)
+                        .then(this._handleResponseRetrieve.bind(this))
+                        .then(this._fireFetchResponse.bind(this))
+                        .catch(this._fireFetchError.bind(this));
+            },
+
+            // --- Fetch Response Parser
+            // --- ---------------------------
+
+            _isResponseJson: function (response) {
+                var contentType = response.headers.get('content-type');
+                return (contentType && contentType.indexOf('application/json') !== -1)
+            },
+
+            _transformResponseContentType: function (response) {
+                var res = {
+                    status: response.status,
+                    statusText: response.statusText,
+                    url: response.url
+                };
+                // res
+//                response.text()
+                // TODO test content type
+                return response.json().then(function (responseJson) {
+//                return Object.assign(res, {response: responseJson});  // NOT IE
+                    res.body = responseJson;
+                    return res;
                 });
             },
 
-            _fetch: function (jwk, data) {
-                var self = this;
-                return this._fetchPromise(jwk, data).then(function (response) {
-                    self.response = response;
-                    self._fireFetchResponse(response);
-                    return response;
-                }).catch(function (err) {
-                    self.response = undefined;
-                    self._fireFetchError(err);
-                });
+
+            // --- Fetch Adapter
+            // --- ---------------------------
+
+            _adapterResponseRetrieve: function (res) {
+                return res;
+            },
+
+
+
+            // --- Response Handler
+            // --- ---------------------------
+
+            _handleResponseRetrieve: function (res) {
+                this.responseHeaders = res;
+                this.response = res.body;
+                console.log('_handleResponse : ', res);
+                return res;
+            },
+
+            // --- Fetch Logic
+            // --- ---------------------------
+
+
+            _fetch: function () {
+
+                return this._fetchPromise(this.url, this.params, this.data);
             },
 
             // --- Event fetch
