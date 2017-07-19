@@ -12,8 +12,10 @@
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
 
     <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
+    <link rel="import" href="../../polymer/lib/elements/dom-repeat.html">
 
     <link rel="import" href="../air-fetch.html">
+
 
     <custom-style>
         <style is="custom-style" include="demo-pages-shared-styles">
@@ -24,12 +26,8 @@
 <div class="vertical-section-container centered">
     <h3>Basic air-fetch demo</h3>
     <demo-snippet>
-            <template is="dom-bind" id="demo">
-                <!--<air-fetch url="https://www.googleapis.com/youtube/v3/search"-->
-                <!--params='{"part":"snippet", "q":"polymer", "key": "AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI", "type": "video"}'-->
-                <!--response="{{ajaxResponse}}">-->
-
-                <!--</air-fetch>   -->
+        <dom-bind>
+            <template>
                 <div>ajaxResponse: <p>[[ajaxResponse]]</p></div>
                 <air-fetch
                         url="https://www.googleapis.com/youtube/v3/search?type=video&part=snippet&q=polymer&key=AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI"
@@ -45,14 +43,8 @@
                         <p>[[item.snippet.description]]</p>
                     </div>
                 </template>
-
             </template>
-        <script>
-            var app = document.querySelector('#demo');
-//            app.url = function (videoId) {
-//                return 'https://www.youtube.com/watch?v=' + videoId;
-//            };
-        </script>
+        </dom-bind>
     </demo-snippet>
 </div>
 </body>
