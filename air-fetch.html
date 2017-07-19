@@ -1,4 +1,5 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
+
 
 <!--
 `air-fetch`
@@ -137,14 +138,13 @@ Polymer 2 Element for Wrap Fetch API
             };
 
             _fetch (jwk, data) {
-                var self = this;
-                return this._fetchPromise(jwk, data).then(function (response) {
-                    self.response = response;
-                    self._fireFetchResponse(response);
+                return this._fetchPromise(jwk, data).then(response =>{
+                    this.response = response;
+                    this._fireFetchResponse(response);
                     return response;
                 }).catch(function (err) {
-                    self.response = undefined;
-                    self._fireFetchError(err);
+                    this.response = undefined;
+                    this._fireFetchError(err);
                 });
             };
 
