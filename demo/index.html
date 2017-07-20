@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
 
@@ -10,45 +10,42 @@
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../../polymer/lib/elements/dom-bind.html">
+    <link rel="import" href="../../polymer/lib/elements/dom-repeat.html">
+
     <link rel="import" href="../air-fetch.html">
 
+
     <custom-style>
-      <style is="custom-style" include="demo-pages-shared-styles">
-      </style>
+        <style is="custom-style" include="demo-pages-shared-styles">
+        </style>
     </custom-style>
-  </head>
-  <body>
-    <div class="vertical-section-container centered">
-      <h3>Basic air-fetch demo</h3>
-      <demo-snippet>
-        <template is="dom-bind" id="demo">
-          <!--<air-fetch url="https://www.googleapis.com/youtube/v3/search"-->
-                     <!--params='{"part":"snippet", "q":"polymer", "key": "AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI", "type": "video"}'-->
-                     <!--response="{{ajaxResponse}}">-->
+</head>
+<body>
+<div class="vertical-section-container centered">
+    <h3>Basic air-fetch demo</h3>
+    <demo-snippet>
+        <dom-bind>
+            <template>
+                <div>ajaxResponse: <p>[[ajaxResponse]]</p></div>
+                <air-fetch
+                        url="https://www.googleapis.com/youtube/v3/search?type=video&part=snippet&q=polymer&key=AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI"
+                        params='{"part":"snippet", "q":"polymer", "key": "AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI", "type": "video"}'
+                        response="{{ajaxResponse}}">
 
-          <!--</air-fetch>   -->
-            <div>ajaxResponse: <p>[[ajaxResponse]]</p></div>
-          <air-fetch url="https://www.googleapis.com/youtube/v3/search?type=video&part=snippet&q=polymer&key=AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI"
-                     params='{"part":"snippet", "q":"polymer", "key": "AIzaSyAuecFZ9xJXbGDkQYWBmYrtzOGJD-iDIgI", "type": "video"}'
-                     response="{{ajaxResponse}}">
-
-          </air-fetch>
-          <template is="dom-repeat" items="[[ajaxResponse.items]]">
-            <div class="horizontal-section">
-              <h2><a href="[[url(item.id.videoId)]]" target="_blank">[[item.snippet.title]]</a></h2>
-              <iron-image src="[[item.snippet.thumbnails.high.url]]" width="256" height="256" sizing="cover" preload fade></iron-image>
-              <p>[[item.snippet.description]]</p>
-            </div>
-          </template>
-
-        </template>
-          <script>
-              var app = document.querySelector('#demo');
-              app.url = function (videoId) {
-                  return 'https://www.youtube.com/watch?v=' + videoId;
-              };
-          </script>
-      </demo-snippet>
-    </div>
-  </body>
+                </air-fetch>
+                <template is="dom-repeat" items="[[ajaxResponse.items]]">
+                    <div class="horizontal-section">
+                        <h2><a href="[[url(item.id.videoId)]]" target="_blank">[[item.snippet.title]]</a></h2>
+                        <iron-image src="[[item.snippet.thumbnails.high.url]]" width="256" height="256" sizing="cover"
+                                    preload fade></iron-image>
+                        <p>[[item.snippet.description]]</p>
+                    </div>
+                </template>
+            </template>
+        </dom-bind>
+    </demo-snippet>
+</div>
+</body>
 </html>

@@ -1,140 +1,151 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../polymer/polymer-element.html">
 
 <!--
-`air-fetch`
-Polymer 2 Element for Wrap Fetch API
-
-@demo demo/index.html
+@group Five Elements
+@element air-fetch
 -->
-
 <dom-module id="air-fetch">
-
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+        <h2>Hello [[response]]</h2>
+    </template>
 
     <script>
-        Polymer({
-            is: 'air-fetch',
+        class AirFetch extends Polymer.Element {
+            static get is() {
+                return 'air-fetch';
+            }
 
-
-            properties: {
-                url: {
-                    type: String,
-                    value: 'air-fetch'
-                },
-                params: {
-                    type: Object,
-                    value: function () {
-                        return {};
+            static get properties() {
+                return {
+                    url: {
+                        type: String
+                    },
+                    params: {
+                        type: Object,
+                        value: function () {
+                            return {};
+                        }
+                    },
+                    notAuto: {
+                        type: Boolean,
+                        value: false
+                    },
+                    method: {
+                        type: String,
+                        value: 'GET'
+                    },
+                    /**
+                     * A request has an associated mode, which is "same-origin", "cors", "no-cors", "navigate", or "websocket".
+                     * Unless stated otherwise, it is "no-cors".
+                     */
+                    mode: {
+                        type: String,
+                        value: 'cors'
+                    },
+                    /**
+                     * A request has an associated cache mode, which is "default", "no-store", "reload", "no-cache", "force-cache", or "only-if-cached".
+                     * Unless stated otherwise, it is "default".
+                     * <ul>
+                     *    <li>"default":  Fetch will inspect the HTTP cache on the way to the network. If there is a fresh response it will be used. If there is a stale response a conditional request will be created, and a normal request otherwise. It then updates the HTTP cache with the response. [HTTP] [HTTP-SEMANTICS] [HTTP-COND] [HTTP-CACHING] [HTTP-AUTH]</li>
+                     *    <li>"no-store": Fetch behaves as if there is no HTTP cache at all.</li>
+                     *    <li>"reload": Fetch behaves as if there is no HTTP cache on the way to the network. Ergo, it creates a normal request and updates the HTTP cache with the response.</li>
+                     *    <li>"no-cache": Fetch creates a conditional request if there is a response in the HTTP cache and a normal request otherwise. It then updates the HTTP cache with the response.</li>
+                     *    <li>"force-cache": Fetch uses any response in the HTTP cache matching the request, not paying attention to staleness. If there was no response, it creates a normal request and updates the HTTP cache with the response.</li>
+                     *    <li>"only-if-cached": Fetch uses any response in the HTTP cache matching the request, not paying attention to staleness. If there was no response, it returns a network error. (Can only be used when request’s mode is "same-origin". Any cached redirects will be followed assuming request’s redirect mode is "follow" and the redirects do not violate request’s mode.)</li>
+                     * </ul>
+                     */
+                    cache: {
+                        type: String,
+                        value: 'default'
+                    },
+                    headers: {
+                        type: Array
+                    },
+                    response: {
+                        type: Object,
+                        notify: true
                     }
-                },
-                notAuto: {
-                    type: Boolean,
-                    value: false
-                },
-                init: {
-                    type: Object,
-                    value: function () {
-                        return {
-                            method: 'GET',
-                            headers: 'myHeaders',
-                            mode: 'cors',
-                            cache: 'default'
-                        };
-                    }
-                },
-                method: {
-                    type: String,
-                    value: 'GET',
-                    observer: '_methodChanged'
-                },
-                /**
-                 * A request has an associated mode, which is "same-origin", "cors", "no-cors", "navigate", or "websocket".
-                 * Unless stated otherwise, it is "no-cors".
-                 */
-                mode: {
-                    type: String,
-                    value: 'cors',
-                    observer: '_modeChanged'
-                },
-                /**
-                 * A request has an associated cache mode, which is "default", "no-store", "reload", "no-cache", "force-cache", or "only-if-cached".
-                 * Unless stated otherwise, it is "default".
-                 * <ul>
-                 *    <li>"default":  Fetch will inspect the HTTP cache on the way to the network. If there is a fresh response it will be used. If there is a stale response a conditional request will be created, and a normal request otherwise. It then updates the HTTP cache with the response. [HTTP] [HTTP-SEMANTICS] [HTTP-COND] [HTTP-CACHING] [HTTP-AUTH]</li>
-                 *    <li>"no-store": Fetch behaves as if there is no HTTP cache at all.</li>
-                 *    <li>"reload": Fetch behaves as if there is no HTTP cache on the way to the network. Ergo, it creates a normal request and updates the HTTP cache with the response.</li>
-                 *    <li>"no-cache": Fetch creates a conditional request if there is a response in the HTTP cache and a normal request otherwise. It then updates the HTTP cache with the response.</li>
-                 *    <li>"force-cache": Fetch uses any response in the HTTP cache matching the request, not paying attention to staleness. If there was no response, it creates a normal request and updates the HTTP cache with the response.</li>
-                 *    <li>"only-if-cached": Fetch uses any response in the HTTP cache matching the request, not paying attention to staleness. If there was no response, it returns a network error. (Can only be used when request’s mode is "same-origin". Any cached redirects will be followed assuming request’s redirect mode is "follow" and the redirects do not violate request’s mode.)</li>
-                 * </ul>
-                 */
-                cache: {
-                    type: String,
-                    value: 'default',
-                    observer: '_cacheChanged'
-                },
-                headers: {
-                    type: Array
-                },
-                response: {
-                    type: Object,
-                    notify: true
-                }
-            },
+                };
+            }
 
-            observers: [
-                '_fetchObserver(url, init, notAuto)'
-            ],
+            static get observers() {
+                return [
+                    '_fetchObserver(url, method, mode, cache, redirect,referrer, credentials, notAuto)'
 
+                ];
+            }
 
-            // --- Changed Observer
-            // --- ---------------------------
-            _methodChanged: function (newValue, oldValue) {
-                console.log('_methodChanged', newValue);
-                this.init.method = newValue;
-                this.init = this.init;
-            },
-
-            _modeChanged: function (newValue, oldValue) {
-                console.log('_modeChanged', newValue);
-                this.init.mode = newValue;
-                this.init = this.init;
-            },
-
-            _cacheChanged: function (newValue, oldValue) {
-                console.log('_cacheChanged', newValue);
-                this.init.cache = newValue;
-                this.init = this.init;
-            },
 
             // --- Complex Observer
             // --- ---------------------------
 
-            _fetchObserver: function (url, init, notAuto) {
+            _fetchObserver(url, method, mode, cache, redirect, referrer, credentials, notAuto) {
+                console.log('_fetchObserver', url);
                 if (!notAuto) {
+                    const init = this._defaultOptions();
                     this._fetch(url, init);
                 }
-            },
+            };
+
+
+            // --- Fetch Configuration
+            // --- ---------------------------
+
+            _defaultHearders() {
+                let myHeaders = new Headers({
+                    'Content-Type': 'application/json' // "text/plain"
+                });
+                return myHeaders;
+            };
+
+            /**
+             * Compute default Fetch option
+             * @param method
+             * @param data
+             * @returns {{method: *, mode: *, headers: *}}
+             * @private
+             */
+            _defaultOptions() {
+                let myHeaders = this._defaultHearders();
+                // https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
+                let init = {
+                    method: this.method,
+                    mode: this.mode,
+                    cache: this.cache,
+                    redirect: this.redirect,
+                    referrer: this.referrer,
+                    credentials: this.credentials,
+                    headers: myHeaders
+                };
+                if (this.integrity) {
+                    init.integrity = this.integrity;
+                }
+                return init;
+            };
 
             // --- API
             // --- ---------------------------
-
-            _fetchPromise: function (url, init) {
-                return fetch(url, init).then(function (response) {
+            _fetchPromise(url, init) {
+                return fetch(url, init).then(response => {
                     return response.json();
                 });
-            },
+            }
 
-            _fetch: function (jwk, data) {
-                var self = this;
-                return this._fetchPromise(jwk, data).then(function (response) {
-                    self.response = response;
-                    self._fireFetchResponse(response);
+            _fetch(url, data) {
+                return this._fetchPromise(url, data).then(response => {
+                    this.response = response;
+                    this._fireFetchResponse(response);
                     return response;
                 }).catch(function (err) {
-                    self.response = undefined;
-                    self._fireFetchError(err);
+                    this.response = undefined;
+                    this._fireFetchError(err);
                 });
-            },
+            }
 
             // --- Event fetch
             // --- ---------------------------
@@ -143,20 +154,20 @@ Polymer 2 Element for Wrap Fetch API
              *
              * @event air-fetch-response
              */
-            _fireFetchResponse: function (response) {
+            _fireFetchResponse(response) {
                 console.log('air-fetch-response', response);
 //                this.fire('air-fetch-response', response);
-            },
+            }
 
             /**
              * Fired when a fetch Error in raised.
              *
              * @event air-fetch-error
              */
-            _fireFetchError: function (error) {
+            _fireFetchError(error) {
                 console.error('air-fetch-error', error);
                 this.fire('air-fetch-error', {error: error});
-            },
+            }
 
             // --- Url logic
             // --- ---------------------------
@@ -166,7 +177,7 @@ Polymer 2 Element for Wrap Fetch API
              *
              * @return {string}
              */
-            _queryString: function (params) {
+            _queryString(params) {
                 var queryParts = [];
                 var param;
                 var value;
@@ -185,14 +196,14 @@ Polymer 2 Element for Wrap Fetch API
                     }
                 }
                 return queryParts.join('&');
-            },
+            }
 
             /**
              * The `url` with query string (if `params` are specified).
              *
              * @return {string}
              */
-            _requestUrl: function (urlBase, params) {
+            _requestUrl(urlBase, params) {
                 var queryString = this._queryString(params);
                 var url = urlBase || '';
                 if (queryString) {
@@ -200,9 +211,10 @@ Polymer 2 Element for Wrap Fetch API
                     return url + bindingChar + queryString;
                 }
                 return url;
-            },
+            }
 
+        }
 
-        });
+        window.customElements.define(AirFetch.is, AirFetch);
     </script>
 </dom-module>
