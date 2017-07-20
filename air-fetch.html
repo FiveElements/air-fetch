@@ -111,9 +111,9 @@
              * @private
              */
             _defaultOptions() {
-                let myHeaders = this._defaultHearders();
+                const myHeaders = this._defaultHearders();
                 // https://developer.mozilla.org/en-US/docs/Web/API/Request/Request
-                let init = {
+                const init = {
                     method: this.method,
                     mode: this.mode,
                     cache: this.cache,
@@ -178,15 +178,15 @@
              * @return {string}
              */
             _queryString(params) {
-                var queryParts = [];
-                var param;
-                var value;
-                var esc = window.encodeURIComponent;
+                let queryParts = [];
+                let param;
+                let value;
+                let esc = window.encodeURIComponent;
                 for (param in params) {
                     value = params[param];
                     param = esc(param);
                     if (Array.isArray(value)) {
-                        for (var i = 0; i < value.length; i++) {
+                        for (let i = 0; i < value.length; i++) {
                             queryParts.push(param + '=' + esc(value[i]));
                         }
                     } else if (value !== null) {
@@ -204,10 +204,10 @@
              * @return {string}
              */
             _requestUrl(urlBase, params) {
-                var queryString = this._queryString(params);
-                var url = urlBase || '';
+                const queryString = this._queryString(params);
+                const url = urlBase || '';
                 if (queryString) {
-                    var bindingChar = url.indexOf('?') >= 0 ? '&' : '?';
+                    let bindingChar = url.indexOf('?') >= 0 ? '&' : '?';
                     return url + bindingChar + queryString;
                 }
                 return url;
